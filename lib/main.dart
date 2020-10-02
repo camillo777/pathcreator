@@ -2,7 +2,6 @@ import 'dart:convert';
 import 'dart:html' as html;
 import 'dart:html';
 
-
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:vector_math/vector_math_64.dart';
@@ -51,6 +50,10 @@ class _MyHomePageState extends State<MyHomePage>
   Controller controller;
 
   AnimationController animationController;
+
+  bool isAnimTouch = false;
+  double animTouchDuration = 1;
+  double animTouchTime = 0;
 
   @override
   void initState() {
@@ -262,7 +265,7 @@ class _MyHomePageState extends State<MyHomePage>
     );
   }
 
-  Offset toScene(Offset viewportPoint) {
+  /*Offset toScene(Offset viewportPoint) {
     // On viewportPoint, perform the inverse transformation of the scene to get
     // where the point would be in the scene before the transformation.
     final Matrix4 inverseMatrix = Matrix4.inverted(controller.getTransform);
@@ -272,7 +275,7 @@ class _MyHomePageState extends State<MyHomePage>
       0,
     ));
     return Offset(untransformed.x, untransformed.y);
-  }
+  }*/
 
   Offset toSceneAbsolute(Offset viewportPoint, Size screenSize) {
     // On viewportPoint, perform the inverse transformation of the scene to get

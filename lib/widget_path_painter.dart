@@ -39,9 +39,9 @@ class PathPainter extends CustomPainter {
           final double t = i / controller.steps.toDouble();
           Offset offset = toScr(controller.getPath.transform(t), size);
           if (i == 0)
-            path.moveTo( offset.dx, offset.dy);
+            path.moveTo(offset.dx, offset.dy);
           else
-            path.lineTo( offset.dx, offset.dy);
+            path.lineTo(offset.dx, offset.dy);
           canvas.drawCircle(offset, controller.pathPointDrawRadius, paintBlue);
         }
         canvas.drawPath(path, paintGreen);
@@ -55,7 +55,8 @@ class PathPainter extends CustomPainter {
           i == 0 ? paintFirstPoint : paintPoint);
 
       if (controller.getCurrentPointIndex == i)
-        canvas.drawCircle(cp, controller.controlPointDrawRadius * 2, paintSelected);
+        canvas.drawCircle(
+            cp, controller.controlPointDrawRadius * 2, paintSelected);
     }
 
     // paint arc sampled constant speed parametrization
@@ -86,8 +87,14 @@ class PathPainter extends CustomPainter {
   }
 
   void _paintCanvas(Canvas canvas, Size size) {
-    canvas.drawLine(Offset.zero, Offset(size.width, size.height), paintDebug);
-    canvas.drawLine(Offset(size.width, 0), Offset(0, size.height), paintDebug);
+    Rect view = Rect.fromLTWH(0, 0, size.width, size.height);
+    canvas.drawLine(view.topLeft, view.bottomRight, paintDebug);
+    canvas.drawLine(view.bottomLeft, view.topRight, paintDebug);
+
+    canvas.drawLine(view.topLeft, view.topRight, paintDebug);
+    canvas.drawLine(view.topRight, view.bottomRight, paintDebug);
+    canvas.drawLine(view.bottomRight, view.bottomLeft, paintDebug);
+    canvas.drawLine(view.bottomLeft, view.topLeft, paintDebug);
   }
 
   /*void _paintArcSampler(Canvas canvas, Size size) {
