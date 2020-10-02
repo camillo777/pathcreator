@@ -16,9 +16,12 @@ class RowColumn extends StatelessWidget {
   Widget build(BuildContext context) {
     return width < height
         ? Column(
-          mainAxisAlignment: MainAxisAlignment.center,
+          mainAxisAlignment: MainAxisAlignment.start,
           mainAxisSize: MainAxisSize.max,
           children: children)
-        : Row(children: children);
+        : Row(
+          mainAxisAlignment: MainAxisAlignment.start,
+          mainAxisSize: MainAxisSize.max,
+          children: children);
   }
 }
