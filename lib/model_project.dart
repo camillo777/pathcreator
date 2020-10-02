@@ -11,8 +11,8 @@ extension Json on Offset {
   Map toJson() {
     prnow(_tag, "toJson");
     return {
-      'dx': this.dx,
-      'dy': this.dy,
+      'dx': "${this.dx.toStringAsFixed(3)}",
+      'dy': "${this.dy.toStringAsFixed(3)}",
     };
   }
 }
