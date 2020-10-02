@@ -8,14 +8,17 @@ import 'sampler_arc.dart';
 import 'service_projectstorage.dart';
 import 'utils.dart';
 
-enum DrawFunction { Add, Insert }
+enum DrawFunction { AddPoint, InsertPoint, MovePoint }
 
 class Controller {
-  DrawFunction _currentDrawFunction = DrawFunction.Add;
+  static const _tag = "Controller";
+
+  DrawFunction _currentDrawFunction = DrawFunction.AddPoint;
   List<Offset> _controlPoints = List<Offset>();
   List<Offset> get getControlPoints => _controlPoints;
-  double controlPointRadius = 8;
-  double pathPointRadius = 1;
+  double controlPointToucheRadius = 0.005;
+  double controlPointDrawRadius = 8;
+  double pathPointDrawRadius = 1;
   int steps = 100;
   double _scale = 1.0;
   bool _loop = true;
@@ -37,6 +40,32 @@ class Controller {
 
   Matrix4 _transform = Matrix4.identity()..scale(1.0);
   Matrix4 get getTransform => _transform;
+
+  // translate and scale from 0-1920 to 0-1
+  /*Matrix4 _transformViewPort = Matrix4.identity()..scale(1.0);
+  Matrix4 get getTransformViewPort => _transformViewPort;
+  void setViewPortTransform(Size size) {
+    double xScaleFactor = 1 / size.width;
+    double yScaleFactor = 1 / size.height;
+    _transformViewPort = Matrix4.identity()
+      ..scale(xScaleFactor, yScaleFactor, 0);
+  }*/
+
+  /*Offset toViewport01(Offset widgetPoint) {
+    // On viewportPoint, perform the inverse transformation of the scene to get
+    // where the point would be in the scene before the transformation.
+    final Matrix4 inverseMatrix = Matrix4.inverted(getTransformViewPort);
+    final Vector3 untransformed = inverseMatrix.transform3(Vector3(
+      widgetPoint.dx,
+      widgetPoint.dy,
+      0,
+    ));
+    return Offset(untransformed.x, untransformed.y);
+  }*/
+
+  /*void resize(Size size) {
+    setViewPortTransform(size);
+  }*/
 
   ArcSampler2 _arcSampler;
   ArcSampler2 get getArcSampler => _arcSampler;
@@ -132,11 +161,13 @@ You can see the wiki article I wrote for LibGDX on Splines, take a look at the l
     updatePath(false);
   }
 
-  int findSelectedPoint(Offset offset, {double tolerance = 1.0}) {
+  int findSelectedPoint(Offset offset) { //, {double tolerance = 0.01}) {
+    prnow(_tag, "findSelectedPoint | offset:$offset");
     for (int i = 0; i < _controlPoints.length; i++) {
+      // points are in 0-1 interval
       Offset controlPoint = _controlPoints[i];
       //double tolerance = 1.0;
-      if ((offset - controlPoint).distance <= controlPointRadius + tolerance) {
+      if ((offset - controlPoint).distance <= controlPointToucheRadius) {
         // this point
         print("getPoint | offset:$offset i:$i controlPoint:$controlPoint");
         return i;

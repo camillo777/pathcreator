@@ -37,12 +37,12 @@ class PathPainter extends CustomPainter {
         Path path = Path();
         for (int i = 0; i < controller.steps; i++) {
           final double t = i / controller.steps.toDouble();
-          Offset offset = controller.getPath.transform(t);
+          Offset offset = toScr(controller.getPath.transform(t), size);
           if (i == 0)
-            path.moveTo(offset.dx, offset.dy);
+            path.moveTo( offset.dx, offset.dy);
           else
-            path.lineTo(offset.dx, offset.dy);
-          canvas.drawCircle(offset, controller.pathPointRadius, paintBlue);
+            path.lineTo( offset.dx, offset.dy);
+          canvas.drawCircle(offset, controller.pathPointDrawRadius, paintBlue);
         }
         canvas.drawPath(path, paintGreen);
       }
@@ -50,20 +50,19 @@ class PathPainter extends CustomPainter {
 
     // paint control points
     for (int i = 0; i < controller.getControlPoints.length; i++) {
-      Offset cp = controller.getControlPoints[i];
-      canvas.drawCircle(cp, controller.controlPointRadius,
+      Offset cp = toScr(controller.getControlPoints[i], size);
+      canvas.drawCircle(cp, controller.controlPointDrawRadius,
           i == 0 ? paintFirstPoint : paintPoint);
 
       if (controller.getCurrentPointIndex == i)
-        canvas.drawCircle(cp, controller.controlPointRadius*2, paintSelected);
+        canvas.drawCircle(cp, controller.controlPointDrawRadius * 2, paintSelected);
     }
 
     // paint arc sampled constant speed parametrization
     if (controller.getArcSampler != null) {
-      controller.getArcSampler.drawSamples(canvas, paintDebug);
-      controller.getArcSampler.drawNewSamples(canvas, paintArcSampler);
+      controller.getArcSampler.drawSamples(canvas, paintDebug, size);
+      controller.getArcSampler.drawNewSamples(canvas, paintArcSampler, size);
     }
-
 
     /*if ((controller.getIsAnim) && (controller.getArcSampler != null)) {
       print("${controller.getAnimTick}");
@@ -113,4 +112,8 @@ class PathPainter extends CustomPainter {
       }
     }
   }*/
+
+  Offset toScr(Offset normalized, Size size) {
+    return Offset(normalized.dx * size.width, normalized.dy * size.height);
+  }
 }

@@ -107,26 +107,30 @@ class ArcSampler2 {
     //throw Exception("Not found for $targetArcLength");
   }
 
-  void drawSamples(Canvas canvas, Paint paint) {
+  void drawSamples(Canvas canvas, Paint paint, Size size) {
     print("drawSamples");
-    Offset previous = _samples[0];
+    Offset previous = toScr(_samples[0],size);
     for (int i = 1; i < _samples.length; i++) {
-      Offset current = _samples[i];
+      Offset current = toScr(_samples[i],size);
       canvas.drawCircle(current, 2, paint);
       canvas.drawLine(previous, current, paint);
       previous = current;
     }
   }
 
-  void drawNewSamples(Canvas canvas, Paint paint) {
+  void drawNewSamples(Canvas canvas, Paint paint, Size size) {
     print("drawNewSamples");
-    Offset previous = _newSamples[0];
+    Offset previous = toScr(_newSamples[0],size);
     for (int i = 1; i < _newSamples.length; i++) {
-      Offset current = _newSamples[i];
+      Offset current = toScr(_newSamples[i],size);
       canvas.drawCircle(current, 2, paint);
       canvas.drawLine(previous, current, paint);
       previous = current;
     }
+  }
+
+  Offset toScr(Offset normalized, Size size) {
+    return Offset(normalized.dx * size.width, normalized.dy * size.height);
   }
 }
 

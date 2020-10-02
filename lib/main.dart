@@ -1,4 +1,7 @@
+import 'dart:convert';
+import 'dart:html' as html;
 import 'dart:html';
+
 
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
@@ -6,6 +9,7 @@ import 'package:vector_math/vector_math_64.dart';
 
 import 'controller.dart';
 import 'model_project.dart';
+import 'utils.dart';
 import 'widget_mybutton.dart';
 import 'widget_path_painter.dart';
 import 'widget_rowcolumn.dart';
@@ -41,6 +45,8 @@ class MyHomePage extends StatefulWidget {
 
 class _MyHomePageState extends State<MyHomePage>
     with SingleTickerProviderStateMixin {
+  static const _tag = "_MyHomePageState";
+
   final GlobalKey _targetKey = GlobalKey();
   Controller controller;
 
@@ -60,8 +66,21 @@ class _MyHomePageState extends State<MyHomePage>
       if (status == AnimationStatus.completed) animationController.reset();
     });
 
+    /*if (kIsWeb) {
+//final text = 'this is the text file';
+      final script =
+          html.document.createElement('script') as html.ScriptElement;
+      script.src = "http://cdn.jsdelivr.net/g/filesaver.js";
+
+      html.document.body.nodes.add(script);
+    }*/
+
     super.initState();
   }
+
+  /*void resize(Size size) {
+    controller.resize(size);
+  }*/
 
   @override
   Widget build(BuildContext context) {
@@ -71,6 +90,7 @@ class _MyHomePageState extends State<MyHomePage>
       backgroundColor: Color(0xff000000),
       body: LayoutBuilder(
         builder: (context, constraints) {
+          //controller.resize(Size(constraints.maxWidth, constraints.maxHeight));
           return RowColumn(
               width: constraints.maxWidth,
               height: constraints.maxHeight,
@@ -78,7 +98,9 @@ class _MyHomePageState extends State<MyHomePage>
                 Container(
                   alignment: Alignment.topCenter,
                   color: Color(0xff00ff00),
-                  width: constraints.maxWidth * 0.1,
+                  width: constraints.maxWidth > constraints.maxHeight
+                      ? constraints.maxWidth * 0.1
+                      : constraints.maxWidth,
                   child: RowColumn(
                       width: constraints.maxHeight,
                       height: constraints.maxWidth,
@@ -87,20 +109,29 @@ class _MyHomePageState extends State<MyHomePage>
                         MyButton(
                           onPressed: () {
                             setState(() => controller
-                                .setCurrentDrawFunction(DrawFunction.Add));
+                                .setCurrentDrawFunction(DrawFunction.AddPoint));
                           },
                           text: "ADD",
                           selected: controller.getCurrentDrawFunction ==
-                              DrawFunction.Add,
+                              DrawFunction.AddPoint,
                         ),
                         MyButton(
                           onPressed: () {
-                            setState(() => controller
-                                .setCurrentDrawFunction(DrawFunction.Insert));
+                            setState(() => controller.setCurrentDrawFunction(
+                                DrawFunction.InsertPoint));
                           },
-                          text: "INSERT",
+                          text: "INS",
                           selected: controller.getCurrentDrawFunction ==
-                              DrawFunction.Insert,
+                              DrawFunction.InsertPoint,
+                        ),
+                        MyButton(
+                          onPressed: () {
+                            setState(() => controller.setCurrentDrawFunction(
+                                DrawFunction.MovePoint));
+                          },
+                          text: "MOVE",
+                          selected: controller.getCurrentDrawFunction ==
+                              DrawFunction.MovePoint,
                         ),
                         MyButton(
                           onPressed: () {
@@ -170,6 +201,11 @@ class _MyHomePageState extends State<MyHomePage>
                                 "onTapUp | local:${details.localPosition} global:${details.globalPosition}");
                             _onTapUp(details);
                           },
+                          onTapDown: (details) {
+                            print(
+                                "onTapDown | local:${details.localPosition} global:${details.globalPosition}");
+                            _onTapDown(details);
+                          },
                           onPanStart: (details) {
                             print(
                                 "onPanStart | local:${details.localPosition} global:${details.globalPosition}");
@@ -192,7 +228,9 @@ class _MyHomePageState extends State<MyHomePage>
                 Container(
                   alignment: Alignment.topCenter,
                   color: Color(0xff00ff00),
-                  width: constraints.maxWidth * 0.1,
+                  width: constraints.maxWidth > constraints.maxHeight
+                      ? constraints.maxWidth * 0.1
+                      : constraints.maxWidth,
                   child: RowColumn(
                       width: constraints.maxHeight,
                       height: constraints.maxWidth,
@@ -236,20 +274,41 @@ class _MyHomePageState extends State<MyHomePage>
     return Offset(untransformed.x, untransformed.y);
   }
 
+  Offset toSceneAbsolute(Offset viewportPoint, Size screenSize) {
+    // On viewportPoint, perform the inverse transformation of the scene to get
+    // where the point would be in the scene before the transformation.
+    final Matrix4 inverseMatrix = Matrix4.inverted(controller.getTransform);
+    final Vector3 untransformed = inverseMatrix.transform3(Vector3(
+      viewportPoint.dx,
+      viewportPoint.dy,
+      0,
+    ));
+
+    double scaledX = untransformed.x / screenSize.width;
+    double scaledY = untransformed.y / screenSize.height;
+    //prnow(_tag, "untransformedX: ${untransformed.x} / ${screenSize.width} = $scaledX");
+    //prnow(_tag,"untransformedY: ${untransformed.y} / ${screenSize.height} = $scaledY");
+    //prnow(_tag, "${scaledX.clamp(0.0, 1.0)} ${scaledY.clamp(0.0, 1.0)}");
+    return Offset(scaledX.clamp(0.0, 1.0), scaledY.clamp(0.0, 1.0));
+  }
+
   Offset getTransformedPoint(Offset globalPosition) {
     print("getTransformedPoint glob:$globalPosition");
     final RenderBox renderBox =
         _targetKey.currentContext.findRenderObject() as RenderBox;
     final Offset zeroOffset = renderBox.localToGlobal(Offset.zero);
     final Offset offset = globalPosition - zeroOffset;
-    final Offset scenePoint = /*_transformationController.*/ toScene(offset);
+    final Offset scenePoint = /*_transformationController.*/ toSceneAbsolute(
+        offset, renderBox.size);
     print(
-        "glob:$globalPosition zeroOff:$zeroOffset scenePoint:$scenePoint size:${renderBox.size}");
+        "glob:$globalPosition zeroOff:$zeroOffset offset:$offset scenePoint:(${scenePoint.dx},${scenePoint.dy}) size:${renderBox.size}");
+    //prnow(_tag, "${controller.toViewport01(scenePoint)}");
 
-    return clampOffset(scenePoint, renderBox.size);
+    //return clampOffset(scenePoint, renderBox.size);
+    return scenePoint;
   }
 
-  Offset clampOffset(Offset offset, Size size) {
+  /*Offset clampOffset(Offset offset, Size size) {
     return Offset(
       offset.dx < 0
           ? 0
@@ -262,7 +321,7 @@ class _MyHomePageState extends State<MyHomePage>
               ? size.height
               : offset.dy,
     );
-  }
+  }*/
 
   void _onTapUp(TapUpDetails details) {
     print(
@@ -282,20 +341,36 @@ class _MyHomePageState extends State<MyHomePage>
 
       controller.setIsMoving = false;
       controller.setCurrentPointIndex = null;
-      if (controller.getCurrentDrawFunction == DrawFunction.Add)
+      if (controller.getCurrentDrawFunction == DrawFunction.AddPoint)
         controller.add(scenePoint /*details.localPosition*/);
-      if (controller.getCurrentDrawFunction == DrawFunction.Insert)
+      if (controller.getCurrentDrawFunction == DrawFunction.InsertPoint)
         controller.insert(scenePoint /*details.localPosition*/);
     });
+  }
+
+  void _onTapDown(TapDownDetails details) {
+    print(
+        "onTapUp | local:${details.localPosition} global:${details.globalPosition}");
+
+    final Offset scenePoint = getTransformedPoint(details.globalPosition);
+    int i = controller.findSelectedPoint(scenePoint); //, tolerance: 0.01);
+    if (i != null) {
+      setState(() {
+        // found point
+        controller.setIsMoving = true;
+        controller.setCurrentPointIndex = i;
+      });
+    }
   }
 
   void _onPanStart(DragStartDetails details) {
     print(
         "onPanStart | local:${details.localPosition} global:${details.globalPosition}");
+    if (controller.getCurrentDrawFunction != DrawFunction.MovePoint) return;
     final Offset scenePoint = getTransformedPoint(details.globalPosition);
 
     //int i = controller.getPoint(details.localPosition);
-    int i = controller.findSelectedPoint(scenePoint, tolerance: 10.0);
+    int i = controller.findSelectedPoint(scenePoint); //, tolerance: 0.01);
     if (i != null) {
       // found point
       controller.setIsMoving = true;
@@ -306,6 +381,8 @@ class _MyHomePageState extends State<MyHomePage>
   void _onPanUpdate(DragUpdateDetails details) {
     print(
         "onPanUpdate | local:${details.localPosition} global:${details.globalPosition}");
+    if (controller.getCurrentDrawFunction != DrawFunction.MovePoint) return;
+
     final Offset scenePoint = getTransformedPoint(details.globalPosition);
 
     if (controller.getIsMoving) {
@@ -317,6 +394,8 @@ class _MyHomePageState extends State<MyHomePage>
 
   void _onPanEnd(DragEndDetails details) {
     print("onPanEnd");
+    if (controller.getCurrentDrawFunction != DrawFunction.MovePoint) return;
+
     setState(() {
       controller.setIsMoving = false;
       controller.setCurrentPointIndex = null;
@@ -355,5 +434,3 @@ class _MyHomePageState extends State<MyHomePage>
     });
   }
 }
-
-

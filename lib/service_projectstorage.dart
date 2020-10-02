@@ -1,3 +1,5 @@
+//import 'dart:html';
+
 import 'package:flutter/foundation.dart' show kIsWeb;
 import 'dart:convert';
 import 'dart:io';
@@ -7,7 +9,7 @@ import 'package:path_provider/path_provider.dart';
 import 'model_project.dart';
 import 'utils.dart';
 
-import 'dart:js' as js;
+//import 'dart:js' as js;
 import 'dart:html' as html;
 
 class ProjectStorage {
@@ -55,15 +57,20 @@ class ProjectStorage {
     prnow(_tag, "saveProject");
 
     if (kIsWeb) {
-//final text = 'this is the text file';
       prnow(_tag, "${project.toJson()}");
       final bytes = utf8.encode(jsonEncode(project));
-
+      
+      /*
+      //final text = 'this is the text file';
+      
+      
+      
       final script =
           html.document.createElement('script') as html.ScriptElement;
       script.src = "http://cdn.jsdelivr.net/g/filesaver.js";
 
       html.document.body.nodes.add(script);
+      
 
 // calls the "saveAs" method from the FileSaver.js libray
       js.context.callMethod("saveAs", [
@@ -74,6 +81,16 @@ class ProjectStorage {
 
       // cleanup
       html.document.body.nodes.remove(script);
+      */
+
+  //File file = // generated somewhere
+  //final rawData = file.readAsBytesSync();
+  final content = base64Encode(bytes);
+  final anchor = html.AnchorElement(
+      href: "data:application/json; charset=UTF-8;base64,$content")
+    ..setAttribute("download", "file.txt")
+    ..click();
+
     } else {
       final file = await getLocalFile;
       file.writeAsString(jsonEncode(project.toJson()));
@@ -81,5 +98,7 @@ class ProjectStorage {
 
     // Write the file
     //return file.writeAsString(jsonEncode(project));
+
+    
   }
 }
