@@ -15,7 +15,10 @@ class RowColumn extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return width < height
-        ? Column(children: children)
+        ? Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          mainAxisSize: MainAxisSize.max,
+          children: children)
         : Row(children: children);
   }
 }
