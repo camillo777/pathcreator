@@ -132,10 +132,10 @@ You can see the wiki article I wrote for LibGDX on Splines, take a look at the l
     updatePath(false);
   }
 
-  int findSelectedPoint(Offset offset) {
+  int findSelectedPoint(Offset offset, {double tolerance = 1.0}) {
     for (int i = 0; i < _controlPoints.length; i++) {
       Offset controlPoint = _controlPoints[i];
-      double tolerance = 1.0;
+      //double tolerance = 1.0;
       if ((offset - controlPoint).distance <= controlPointRadius + tolerance) {
         // this point
         print("getPoint | offset:$offset i:$i controlPoint:$controlPoint");

@@ -31,6 +31,7 @@ class PathPainter extends CustomPainter {
   void paint(Canvas canvas, Size size) {
     _paintCanvas(canvas, size);
 
+    // paint spline in N steps
     if (controller.getControlPoints.length > 3) {
       if (controller.getPath != null) {
         Path path = Path();
@@ -47,21 +48,22 @@ class PathPainter extends CustomPainter {
       }
     }
 
+    // paint control points
     for (int i = 0; i < controller.getControlPoints.length; i++) {
       Offset cp = controller.getControlPoints[i];
       canvas.drawCircle(cp, controller.controlPointRadius,
           i == 0 ? paintFirstPoint : paintPoint);
 
       if (controller.getCurrentPointIndex == i)
-        canvas.drawCircle(cp, controller.controlPointRadius, paintSelected);
+        canvas.drawCircle(cp, controller.controlPointRadius*2, paintSelected);
     }
 
-    //_paintArcSampler(canvas, size);
-
+    // paint arc sampled constant speed parametrization
     if (controller.getArcSampler != null) {
       controller.getArcSampler.drawSamples(canvas, paintDebug);
       controller.getArcSampler.drawNewSamples(canvas, paintArcSampler);
     }
+
 
     /*if ((controller.getIsAnim) && (controller.getArcSampler != null)) {
       print("${controller.getAnimTick}");
