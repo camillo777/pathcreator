@@ -10,7 +10,7 @@ import 'widget_mybutton.dart';
 import 'widget_path_painter.dart';
 import 'widget_rowcolumn.dart';
 
-const int build = 1;
+const int vbuild = 1;
 
 void main() {
   runApp(MyApp());
@@ -144,7 +144,7 @@ class _MyHomePageState extends State<MyHomePage>
                         //decoration: BoxDecoration(color: Color(0x88aa0000)),
                         constraints: BoxConstraints.expand(),
                         child: Text(
-                          "Path creator v.$build",
+                          "Path creator v.$vbuild",
                           style:
                               TextStyle(fontSize: 50, color: Color(0xffffffff)),
                         ),
