@@ -295,7 +295,7 @@ class _MyHomePageState extends State<MyHomePage>
     final Offset scenePoint = getTransformedPoint(details.globalPosition);
 
     //int i = controller.getPoint(details.localPosition);
-    int i = controller.findSelectedPoint(scenePoint, tolerance: 5.0);
+    int i = controller.findSelectedPoint(scenePoint, tolerance: 10.0);
     if (i != null) {
       // found point
       controller.setIsMoving = true;
