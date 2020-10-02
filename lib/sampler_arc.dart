@@ -68,10 +68,12 @@ class ArcSampler2 {
     int index = _indexOfLargestValueSmallerThan(targetArcLength);
     assert(index < _arcLengths.length);
 
+    double t;
+
     // if exact match, return t based on exact index
     if (_arcLengths[index] == targetArcLength) {
       print("exact match: $targetArcLength");
-      return index / (_arcLengths.length - 1);
+      t = index / (_arcLengths.length - 1);
     } else // need to interpolate between two points
     {
       double lengthBefore = _arcLengths[index];
@@ -84,11 +86,16 @@ class ArcSampler2 {
       double segmentFraction = (targetArcLength - lengthBefore) / segmentLength;
 
       // add that fractional amount to t
-      return (index + segmentFraction) / (_arcLengths.length - 1);
+      t = (index + segmentFraction) / (_arcLengths.length - 1);
     }
+
+    assert(t >= 0);
+    assert(t <= 1);
+    assert(t != null);
+    return t;
   }
 
-  // find the index of the largest entry in the table that is smaller than or equal to 
+  // find the index of the largest entry in the table that is smaller than or equal to
   // the desired arcLength
   int _indexOfLargestValueSmallerThan(targetArcLength) {
     print(
@@ -109,9 +116,9 @@ class ArcSampler2 {
 
   void drawSamples(Canvas canvas, Paint paint, Size size) {
     print("drawSamples");
-    Offset previous = toScr(_samples[0],size);
+    Offset previous = toScr(_samples[0], size);
     for (int i = 1; i < _samples.length; i++) {
-      Offset current = toScr(_samples[i],size);
+      Offset current = toScr(_samples[i], size);
       canvas.drawCircle(current, 2, paint);
       canvas.drawLine(previous, current, paint);
       previous = current;
@@ -120,9 +127,9 @@ class ArcSampler2 {
 
   void drawNewSamples(Canvas canvas, Paint paint, Size size) {
     print("drawNewSamples");
-    Offset previous = toScr(_newSamples[0],size);
+    Offset previous = toScr(_newSamples[0], size);
     for (int i = 1; i < _newSamples.length; i++) {
-      Offset current = toScr(_newSamples[i],size);
+      Offset current = toScr(_newSamples[i], size);
       canvas.drawCircle(current, 2, paint);
       canvas.drawLine(previous, current, paint);
       previous = current;
@@ -133,7 +140,6 @@ class ArcSampler2 {
     return Offset(normalized.dx * size.width, normalized.dy * size.height);
   }
 }
-
 
 /*
 // https://gamedevnotesblog.wordpress.com/2017/09/20/reverse-arc-length-parameterization-example-package/
@@ -305,4 +311,3 @@ class ArcSampler {
   }*/
 }
 */
-

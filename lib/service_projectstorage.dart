@@ -29,17 +29,12 @@ class ProjectStorage {
     final path = await getLocalPath;
     return File('$path/project.json');
   }
-  
 
   Future<ModelProject> loadProject() async {
     prnow(_tag, "loadProject");
     try {
-      if (kIsWeb){
-
-      }
-      else {
-
-      }
+      if (kIsWeb) {
+      } else {}
       final file = await getLocalFile;
 
       // Read the file
@@ -59,7 +54,7 @@ class ProjectStorage {
     if (kIsWeb) {
       prnow(_tag, "${project.toJson()}");
       final bytes = utf8.encode(jsonEncode(project));
-      
+
       /*
       //final text = 'this is the text file';
       
@@ -83,14 +78,13 @@ class ProjectStorage {
       html.document.body.nodes.remove(script);
       */
 
-  //File file = // generated somewhere
-  //final rawData = file.readAsBytesSync();
-  final content = base64Encode(bytes);
-  final anchor = html.AnchorElement(
-      href: "data:application/json; charset=UTF-8;base64,$content")
-    ..setAttribute("download", "file.txt")
-    ..click();
-
+      //File file = // generated somewhere
+      //final rawData = file.readAsBytesSync();
+      final content = base64Encode(bytes);
+      final anchor = html.AnchorElement(
+          href: "data:application/json; charset=UTF-8;base64,$content")
+        ..setAttribute("download", "file.json")
+        ..click();
     } else {
       final file = await getLocalFile;
       file.writeAsString(jsonEncode(project.toJson()));
@@ -98,7 +92,5 @@ class ProjectStorage {
 
     // Write the file
     //return file.writeAsString(jsonEncode(project));
-
-    
   }
 }
