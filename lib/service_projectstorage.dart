@@ -13,7 +13,7 @@ import 'utils.dart';
 import 'dart:html' as html;
 
 class ProjectStorage {
-  static const _tag = "ProjectStorage";
+  static const String _tag = "ProjectStorage";
 
   Future<String> get getLocalPath async {
     prnow(_tag, "getLocalPath");

@@ -6,13 +6,13 @@ import 'package:flutter/foundation.dart';
 import 'utils.dart';
 
 extension Json on Offset {
-  static const _tag = "Offset";
+  static const String _tag = "Offset";
 
   Map toJson() {
     prnow(_tag, "toJson");
     return {
-      'dx': "${this.dx.toStringAsFixed(3)}",
-      'dy': "${this.dy.toStringAsFixed(3)}",
+      'dx': double.parse("${this.dx.toStringAsFixed(3)}"),
+      'dy': double.parse("${this.dy.toStringAsFixed(3)}"),
     };
   }
 }
@@ -34,6 +34,7 @@ class ModelProject {
         : null;
 
     return {
+      'ver': "1",
       'controlPoints': jsonControlPoints,
     };
   }
