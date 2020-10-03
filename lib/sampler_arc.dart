@@ -2,9 +2,14 @@
 
 import 'dart:ui';
 
+import 'utils.dart';
+
 typedef Offset ParametricCurve2D(double t);
 
 class ArcSampler2 {
+  static const String _tag = "ArcSampler2";
+  static const bool _debug = false;
+
   final int steps; // 100
   List<Offset> _samples; // 0 to 100 = lenght:101
   List<double> _arcLengths; // 0 to 100 = lenght:101
@@ -33,10 +38,12 @@ class ArcSampler2 {
     }
 
     // debug print samples
-    for (int i = 0; i <= steps; i++) {
-      print("i:$i sample:${_samples[i]} ${_arcLengths[i]}");
+    if (_debug) {
+      for (int i = 0; i <= steps; i++) {
+        print("i:$i sample:${_samples[i]} ${_arcLengths[i]}");
+      }
+      print("totalLenght: $totalLenght");
     }
-    print("totalLenght: $totalLenght");
 
     // arc-length parameterization
     _newSamples = List<Offset>();
@@ -56,13 +63,13 @@ class ArcSampler2 {
 
   // returns t from u
   double _arcLengthParameterization(double u) {
-    print("_arcLengthParameterization | u:$u");
+    if (_debug) prnow(_tag, "_arcLengthParameterization | u:$u");
     assert(u >= 0);
     assert(u <= 1);
 
     // get the target arcLength for curve for parameter u
     double targetArcLength = u * _arcLengths[_arcLengths.length - 1];
-    print("targetArcLength: $targetArcLength");
+    //prnow(_tag, "targetArcLength: $targetArcLength");
 
     // the next function would be a binary search, for efficiency
     int index = _indexOfLargestValueSmallerThan(targetArcLength);
@@ -72,7 +79,7 @@ class ArcSampler2 {
 
     // if exact match, return t based on exact index
     if (_arcLengths[index] == targetArcLength) {
-      print("exact match: $targetArcLength");
+      if (_debug) print("exact match: $targetArcLength");
       t = index / (_arcLengths.length - 1);
     } else // need to interpolate between two points
     {
@@ -98,8 +105,8 @@ class ArcSampler2 {
   // find the index of the largest entry in the table that is smaller than or equal to
   // the desired arcLength
   int _indexOfLargestValueSmallerThan(targetArcLength) {
-    print(
-        "_indexOfLargestValueSmallerThan | targetArcLength:$targetArcLength ${_arcLengths.length}");
+    if (_debug)
+      print("_indexOfLargestValueSmallerThan | targetArcLength:$targetArcLength ${_arcLengths.length}");
 
     for (int i = 1; i < steps; i++) {
       double lower = _arcLengths[i - 1];
@@ -108,7 +115,7 @@ class ArcSampler2 {
         return i;
       }
     }
-    print("END ${_arcLengths.length - 1}");
+    if (_debug) print("END ${_arcLengths.length - 1}");
     return _arcLengths.length - 2;
 
     //throw Exception("Not found for $targetArcLength");

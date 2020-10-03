@@ -200,27 +200,18 @@ class _MyHomePageState extends State<MyHomePage>
                                     );
                                   })),
                           onTapUp: (details) {
-                            print(
-                                "onTapUp | local:${details.localPosition} global:${details.globalPosition}");
                             _onTapUp(details);
                           },
                           onTapDown: (details) {
-                            print(
-                                "onTapDown | local:${details.localPosition} global:${details.globalPosition}");
                             _onTapDown(details);
                           },
                           onPanStart: (details) {
-                            print(
-                                "onPanStart | local:${details.localPosition} global:${details.globalPosition}");
                             _onPanStart(details);
                           },
                           onPanUpdate: (details) {
-                            print(
-                                "onPanUpdate | local:${details.localPosition} global:${details.globalPosition}");
                             _onPanUpdate(details);
                           },
                           onPanEnd: (details) {
-                            print("onPanEnd");
                             _onPanEnd(details);
                           },
                         ),
@@ -296,14 +287,14 @@ class _MyHomePageState extends State<MyHomePage>
   }
 
   Offset getTransformedPoint(Offset globalPosition) {
-    print("getTransformedPoint glob:$globalPosition");
+    prnow(_tag,"getTransformedPoint glob:$globalPosition");
     final RenderBox renderBox =
         _targetKey.currentContext.findRenderObject() as RenderBox;
     final Offset zeroOffset = renderBox.localToGlobal(Offset.zero);
     final Offset offset = globalPosition - zeroOffset;
     final Offset scenePoint = /*_transformationController.*/ toSceneAbsolute(
         offset, renderBox.size);
-    print(
+    prnow(_tag,
         "glob:$globalPosition zeroOff:$zeroOffset offset:$offset scenePoint:(${scenePoint.dx},${scenePoint.dy}) size:${renderBox.size}");
     //prnow(_tag, "${controller.toViewport01(scenePoint)}");
 
@@ -327,7 +318,7 @@ class _MyHomePageState extends State<MyHomePage>
   }*/
 
   void _onTapUp(TapUpDetails details) {
-    print(
+    prnow(_tag,
         "onTapUp | local:${details.localPosition} global:${details.globalPosition}");
 
     final Offset scenePoint = getTransformedPoint(details.globalPosition);
@@ -341,7 +332,7 @@ class _MyHomePageState extends State<MyHomePage>
     */
     setState(() {
       //_board = _board.copyWithSelected(boardPoint);
-
+      //controller.setTouchPoint(null);
       controller.setIsMoving = false;
       controller.setCurrentPointIndex = null;
       if (controller.getCurrentDrawFunction == DrawFunction.AddPoint)
@@ -352,22 +343,26 @@ class _MyHomePageState extends State<MyHomePage>
   }
 
   void _onTapDown(TapDownDetails details) {
-    print(
-        "onTapUp | local:${details.localPosition} global:${details.globalPosition}");
+    prnow(_tag, 
+        "_onTapDown | local:${details.localPosition} global:${details.globalPosition}");
 
     final Offset scenePoint = getTransformedPoint(details.globalPosition);
+    controller.setTouchPoint(scenePoint);
+
     int i = controller.findSelectedPoint(scenePoint); //, tolerance: 0.01);
     if (i != null) {
-      setState(() {
+      //setState(() {
         // found point
         controller.setIsMoving = true;
         controller.setCurrentPointIndex = i;
-      });
+      //});
     }
+
+    setState(() {});
   }
 
   void _onPanStart(DragStartDetails details) {
-    print(
+    prnow(_tag,
         "onPanStart | local:${details.localPosition} global:${details.globalPosition}");
     if (controller.getCurrentDrawFunction != DrawFunction.MovePoint) return;
     final Offset scenePoint = getTransformedPoint(details.globalPosition);
@@ -379,10 +374,12 @@ class _MyHomePageState extends State<MyHomePage>
       controller.setIsMoving = true;
       controller.setCurrentPointIndex = i;
     }
+
+    setState(() {});
   }
 
   void _onPanUpdate(DragUpdateDetails details) {
-    print(
+    prnow(_tag,
         "onPanUpdate | local:${details.localPosition} global:${details.globalPosition}");
     if (controller.getCurrentDrawFunction != DrawFunction.MovePoint) return;
 
@@ -396,7 +393,7 @@ class _MyHomePageState extends State<MyHomePage>
   }
 
   void _onPanEnd(DragEndDetails details) {
-    print("onPanEnd");
+    prnow(_tag,"onPanEnd");
     if (controller.getCurrentDrawFunction != DrawFunction.MovePoint) return;
 
     setState(() {

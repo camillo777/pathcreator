@@ -1,8 +1,11 @@
 import 'package:flutter/rendering.dart';
 
 import 'controller.dart';
+import 'utils.dart';
 
 class PathPainter extends CustomPainter {
+  static const String _tag = "PathPainter";
+
   final Paint paintFirstPoint = Paint()..color = Color(0xffff0000);
   final Paint paintPoint = Paint()
     ..color = Color(0xffff0000)
@@ -63,6 +66,12 @@ class PathPainter extends CustomPainter {
     if (controller.getArcSampler != null) {
       controller.getArcSampler.drawSamples(canvas, paintDebug, size);
       controller.getArcSampler.drawNewSamples(canvas, paintArcSampler, size);
+    }
+
+    // draw touch point (if any)
+    if (controller.getTouchPoint != null) {
+      prnow(_tag, "draw touch point: ${toScr(controller.getTouchPoint, size)}");
+      canvas.drawCircle(toScr(controller.getTouchPoint, size), 20, paintDebug);
     }
 
     /*if ((controller.getIsAnim) && (controller.getArcSampler != null)) {

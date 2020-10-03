@@ -23,6 +23,10 @@ class Controller {
   double _scale = 1.0;
   bool _loop = true;
 
+  Offset _touchPoint;
+  Offset get getTouchPoint => _touchPoint;
+  void setTouchPoint(Offset v) => _touchPoint = v;
+
   CatmullRomSpline _path;
   CatmullRomSpline get getPath => _path;
 
@@ -161,7 +165,8 @@ You can see the wiki article I wrote for LibGDX on Splines, take a look at the l
     updatePath(false);
   }
 
-  int findSelectedPoint(Offset offset) { //, {double tolerance = 0.01}) {
+  int findSelectedPoint(Offset offset) {
+    //, {double tolerance = 0.01}) {
     prnow(_tag, "findSelectedPoint | offset:$offset");
     for (int i = 0; i < _controlPoints.length; i++) {
       // points are in 0-1 interval
