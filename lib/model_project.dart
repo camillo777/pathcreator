@@ -23,7 +23,14 @@ class ModelProject {
   List<Offset> _controlPoints = List<Offset>();
   List<Offset> get getControlPoints => _controlPoints;
 
-  ModelProject({@required List<Offset> controlPoints}) {
+  final int samplingSteps;
+  final int alpSteps;
+
+  ModelProject({
+    @required this.samplingSteps,
+    @required this.alpSteps,
+    @required List<Offset> controlPoints,
+  }) {
     _controlPoints = controlPoints;
   }
 
@@ -35,6 +42,8 @@ class ModelProject {
 
     return {
       'ver': "1",
+      'samplingSteps': samplingSteps,
+      'alpSteps': alpSteps,
       'controlPoints': jsonControlPoints,
     };
   }
@@ -45,6 +54,12 @@ class ModelProject {
     Map map = jsonDecode(json);
     List list = map["controlPoints"];
     List<Offset> offsets = list.map((e) => Offset(e["dx"], e["dy"])).toList();
-    return ModelProject(controlPoints: offsets);
+    int _samplingSteps = map["samplingSteps"];
+    int _alpSteps = map["alpSteps"];
+    return ModelProject(
+      controlPoints: offsets,
+      samplingSteps: _samplingSteps,
+      alpSteps: _alpSteps,
+      );
   }
 }

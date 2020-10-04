@@ -52,6 +52,7 @@ class Controller {
     if (_arcSamplerApproxSteps > 1000) _arcSamplerApproxSteps = 1000;
     updatePath(true);
   }
+
   void decArcSamplerApproxSteps() {
     _arcSamplerApproxSteps -= 100;
     if (_arcSamplerApproxSteps < 100) _arcSamplerApproxSteps = 100;
@@ -299,12 +300,17 @@ You can see the wiki article I wrote for LibGDX on Splines, take a look at the l
     print("loadProject");
     ProjectStorage ps = ProjectStorage();
     ModelProject mp = await ps.loadProject();
+    _arcSamplerApproxSteps = mp.samplingSteps ?? 100;
+    _arcSamplerAlpSteps = mp.alpSteps ?? 100;
     setControlPoints(mp.getControlPoints);
   }
 
   void saveProject() async {
     print("saveProject");
-    ModelProject mp = ModelProject(controlPoints: _controlPoints);
+    ModelProject mp = ModelProject(
+        controlPoints: _controlPoints,
+        alpSteps: _arcSamplerAlpSteps,
+        samplingSteps: _arcSamplerApproxSteps);
     ProjectStorage ps = ProjectStorage();
     await ps.saveProject(mp);
   }

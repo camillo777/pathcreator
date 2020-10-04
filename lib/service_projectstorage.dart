@@ -44,7 +44,7 @@ class ProjectStorage {
       //return jsonDecode(contents);
     } catch (e) {
       // If encountering an error, return 0
-      return ModelProject(controlPoints: []);
+      return ModelProject(controlPoints: [], alpSteps: 100, samplingSteps: 100);
     }
   }
 
