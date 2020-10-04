@@ -2,6 +2,8 @@
 
 import 'dart:ui';
 
+import 'package:flutter/foundation.dart';
+
 import 'utils.dart';
 
 typedef Offset ParametricCurve2D(double t);
@@ -10,25 +12,27 @@ class ArcSampler2 {
   static const String _tag = "ArcSampler2";
   static const bool _debug = false;
 
-  final int steps; // 100
+  final int approxSteps; // 100
+  final int alpSteps; // = 100;
+
   List<Offset> _samples; // 0 to 100 = lenght:101
   List<double> _arcLengths; // 0 to 100 = lenght:101
   List<Offset> _newSamples; // 0 to 100 = lenght:101
   List<Offset> get getNewSamples => _newSamples;
 
-  ArcSampler2(ParametricCurve2D transform, this.steps) {
-    int maxPoint = steps + 1;
+  ArcSampler2({@required ParametricCurve2D transform, @required this.approxSteps, @required this.alpSteps}) {
+    int maxPoint = approxSteps + 1;
 
     _samples = List<Offset>.filled(maxPoint, null);
     _arcLengths = List<double>.filled(maxPoint, null);
     _newSamples = List<Offset>.filled(maxPoint, null);
 
-    // calculate samples
+    // calculate samples which approximate curve
     _samples[0] = transform(0);
     _arcLengths[0] = 0;
     double totalLenght = 0;
-    for (int i = 1; i <= steps; i++) {
-      double t = i / steps;
+    for (int i = 1; i <= approxSteps; i++) {
+      double t = i / approxSteps;
       _samples[i] = transform(t);
 
       double segmentLen = (_samples[i] - _samples[i - 1]).distance;
@@ -39,7 +43,7 @@ class ArcSampler2 {
 
     // debug print samples
     if (_debug) {
-      for (int i = 0; i <= steps; i++) {
+      for (int i = 0; i <= approxSteps; i++) {
         print("i:$i sample:${_samples[i]} ${_arcLengths[i]}");
       }
       print("totalLenght: $totalLenght");
@@ -47,7 +51,6 @@ class ArcSampler2 {
 
     // arc-length parameterization
     _newSamples = List<Offset>();
-    int alpSteps = 100;
     double alpStep = 1 / alpSteps;
     double u = 0;
     for (int i = 0; i <= alpSteps; i++) {
@@ -106,9 +109,12 @@ class ArcSampler2 {
   // the desired arcLength
   int _indexOfLargestValueSmallerThan(targetArcLength) {
     if (_debug)
-      print("_indexOfLargestValueSmallerThan | targetArcLength:$targetArcLength ${_arcLengths.length}");
+      print(
+          "_indexOfLargestValueSmallerThan | targetArcLength:$targetArcLength ${_arcLengths.length}");
 
-    for (int i = 1; i < steps; i++) {
+    assert(_arcLengths.length - 1 == approxSteps);
+    for (int i = 1; i < _arcLengths.length - 1; i++) {
+      //for (int i = 1; i < steps; i++) {
       double lower = _arcLengths[i - 1];
       double upper = _arcLengths[i];
       if (targetArcLength >= lower && targetArcLength < upper) {

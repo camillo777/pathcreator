@@ -108,7 +108,7 @@ class _MyHomePageState extends State<MyHomePage>
                       width: constraints.maxHeight,
                       height: constraints.maxWidth,
                       children: <Widget>[
-                        Text("Left"),
+                        //Text("Left"),
                         MyButton(
                           onPressed: () {
                             setState(() => controller
@@ -229,10 +229,10 @@ class _MyHomePageState extends State<MyHomePage>
                       width: constraints.maxHeight,
                       height: constraints.maxWidth,
                       children: <Widget>[
-                        Text("Right"),
+                        //Text("Right"),
                         MyButton(
                           onPressed: () => controller.printValues(),
-                          text: "PRINT VALUES",
+                          text: "PRINT",
                         ),
                         MyButton(
                           onPressed: () {
@@ -242,12 +242,24 @@ class _MyHomePageState extends State<MyHomePage>
                               controller.loadProject();
                             }
                           },
-                          text: "Load project...",
+                          text: "Load...",
                         ),
                         MyButton(
                           onPressed: () => controller.saveProject(),
-                          text: "Save project...",
+                          text: "Save...",
                         ),
+                        Row(children: [
+                          Text("SMP:"),
+                          MyButton(text: "-", onPressed: () => setState(()=>controller.decArcSamplerApproxSteps(),)),
+                          Text("${controller.getArcSamplerApproxSteps}"),
+                          MyButton(text: "+", onPressed: () => setState(()=>controller.incArcSamplerApproxSteps(),)),
+                        ],),
+                        Row(children: [
+                          Text("ALP:"),
+                          MyButton(text: "-", onPressed: () => setState(()=>controller.decArcSamplerAlpSteps(),)),
+                          Text("${controller.getArcSamplerAlpSteps}"),
+                          MyButton(text: "+", onPressed: () => setState(()=>controller.incArcSamplerAlpSteps(),)),
+                        ],)
                       ]),
                 ),
               ]);

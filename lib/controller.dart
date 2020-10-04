@@ -16,7 +16,7 @@ class Controller {
   DrawFunction _currentDrawFunction = DrawFunction.AddPoint;
   List<Offset> _controlPoints = List<Offset>();
   List<Offset> get getControlPoints => _controlPoints;
-  double controlPointToucheRadius = 0.005;
+  double controlPointToucheRadius = 0.02; //0.005;
   double controlPointDrawRadius = 8;
   double pathPointDrawRadius = 1;
   int steps = 100;
@@ -44,6 +44,33 @@ class Controller {
 
   Matrix4 _transform = Matrix4.identity()..scale(1.0);
   Matrix4 get getTransform => _transform;
+
+  int _arcSamplerApproxSteps = 100;
+  get getArcSamplerApproxSteps => _arcSamplerApproxSteps;
+  void incArcSamplerApproxSteps() {
+    _arcSamplerApproxSteps += 100;
+    if (_arcSamplerApproxSteps > 1000) _arcSamplerApproxSteps = 1000;
+    updatePath(true);
+  }
+  void decArcSamplerApproxSteps() {
+    _arcSamplerApproxSteps -= 100;
+    if (_arcSamplerApproxSteps < 100) _arcSamplerApproxSteps = 100;
+    updatePath(true);
+  }
+
+  int _arcSamplerAlpSteps = 100;
+  get getArcSamplerAlpSteps => _arcSamplerAlpSteps;
+  void incArcSamplerAlpSteps() {
+    _arcSamplerAlpSteps += 100;
+    if (_arcSamplerAlpSteps > 1000) _arcSamplerAlpSteps = 1000;
+    updatePath(true);
+  }
+
+  void decArcSamplerAlpSteps() {
+    _arcSamplerAlpSteps -= 100;
+    if (_arcSamplerAlpSteps < 100) _arcSamplerAlpSteps = 100;
+    updatePath(true);
+  }
 
   // translate and scale from 0-1920 to 0-1
   /*Matrix4 _transformViewPort = Matrix4.identity()..scale(1.0);
@@ -141,7 +168,12 @@ You can see the wiki article I wrote for LibGDX on Splines, take a look at the l
       //_arcSampler.checkArcSampler();
 
       //_simpleSampler = SimpleSampler2(_path, 100);
-      if (update) _arcSampler = ArcSampler2(_path.transform, 100);
+      if (update)
+        _arcSampler = ArcSampler2(
+          transform: _path.transform,
+          approxSteps: _arcSamplerApproxSteps,
+          alpSteps: _arcSamplerAlpSteps,
+        );
     }
   }
 
@@ -166,6 +198,8 @@ You can see the wiki article I wrote for LibGDX on Splines, take a look at the l
   }
 
   int findSelectedPoint(Offset offset) {
+    List<int> _selectedPoints = List<int>();
+
     //, {double tolerance = 0.01}) {
     prnow(_tag, "findSelectedPoint | offset:$offset");
     for (int i = 0; i < _controlPoints.length; i++) {
@@ -175,10 +209,25 @@ You can see the wiki article I wrote for LibGDX on Splines, take a look at the l
       if ((offset - controlPoint).distance <= controlPointToucheRadius) {
         // this point
         print("getPoint | offset:$offset i:$i controlPoint:$controlPoint");
-        return i;
+        _selectedPoints.add(i);
+        //return i;
       }
     }
-    return null;
+
+    int index = _selectedPoints[0];
+    double distance = (offset - _controlPoints[index]).distance;
+    // select from list the point with smallest distance
+    for (int i = 1; i < _selectedPoints.length; i++) {
+      // points are in 0-1 interval
+      Offset candidatePoint = _controlPoints[_selectedPoints[i]];
+      //double tolerance = 1.0;
+      if ((offset - candidatePoint).distance <= distance) {
+        distance = (offset - candidatePoint).distance;
+        index = _selectedPoints[i];
+      }
+    }
+
+    return index;
   }
 
   void insert(Offset controlPoint) {
